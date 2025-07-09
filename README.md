@@ -34,4 +34,3 @@ iChatAI is a smart, lightweight, and fully customizable AI chatbot application p
 ```bash
 git clone https://github.com/yourusername/ichatai.git
 cd ichatai
-# Add steps to set up API keys and run
