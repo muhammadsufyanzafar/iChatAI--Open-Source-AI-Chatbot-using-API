@@ -1,38 +1,37 @@
-<<<<<<< HEAD
 # 🤖 **iChatAI - Smart AI Chatbot (Open Source)**
 
-Welcome to **iChatAI**, a sleek and powerful AI chatbot built using **Gemini API**, designed for seamless integration and intelligent conversations.
+Welcome to **iChatAI**, a sleek and powerful AI chatbot built using **OpenAI** / **Gemini API**, designed for seamless integration and intelligent conversations.
 iChatAI is a smart, lightweight, and fully customizable AI chatbot application powered by Gemini APIs. Designed with user experience in mind, iChatAI brings the power of conversational AI to mobile and web platforms in a clean and intuitive interface
 
-![iChatAI Splashscreen](https://github.com/muhammadsufyanzafar/iChatAI---Open-Source-AI-Chatbot-using-Gemini-API/blob/c56806024d3e9d1588194af6f2085c50765f35d6/screen_1.png)
+![iChatAI logo](https://drive.google.com/file/d/1lKwVzsD3Xvm5m8X3Cam4WqLaKS7dUv2x/view?usp=drive_link)
 
 ---
 
 ## 🚀 Features
-- 🔥 Chat with AI using Gemini API
+- 🔥 Chat with AI using OpenAI / Gemini APIs
 - 🧠 Handles real-time conversations
-- 💬 Simple, Clean UI & responsive design
+- 💬 Clean UI & responsive design
 - 🔧 Easy to configure and deploy
-- 🌍 Built with Java in Android Studio
+- 🌍 Built with Flutter / React Native / Kotlin (add your tech stack)
+
 ---
 
 ## 📸 Screenshots
-| Logo | S 1 | S 2 |
+| S 1 | S 2 | S 3 |
 |--------|----------------|-------------------|
-| ![](https://github.com/muhammadsufyanzafar/iChatAI---Open-Source-AI-Chatbot-using-Gemini-API/blob/c56806024d3e9d1588194af6f2085c50765f35d6/ichatailogo.png) | ![](https://github.com/muhammadsufyanzafar/iChatAI---Open-Source-AI-Chatbot-using-Gemini-API/blob/c56806024d3e9d1588194af6f2085c50765f35d6/screen_2.png) | ![](https://github.com/muhammadsufyanzafar/iChatAI---Open-Source-AI-Chatbot-using-Gemini-API/blob/c56806024d3e9d1588194af6f2085c50765f35d6/screen_3.png) |
+| ![](https://drive.google.com/file/d/1hUfaYUjE14PsQJLBBDsJoMzchrUMlEWX/view?usp=drive_link) | ![](https://drive.google.com/file/d/1c4DqDffNrncIWUwZ-SmuzgT5GNAKL4_k/view?usp=drive_link) | ![](https://drive.google.com/file/d/1yY0JHsp7V-IO_15kjv8-7QgVCnVT84RR/view?usp=drive_link) |
 
 ---
 
 ## 📦 Tech Stack
-- This app is created with java language
-- It is connected with Firebase
-- Currently it is running Gemini API
+- Dart / Java / Kotlin / Flutter / React Native
+- Firebase / SQLite / Shared Preferences (if any)
+- OpenAI / Gemini APIs
 
 ---
 
-## Insert your API key here:
-![API key directory](https://github.com/muhammadsufyanzafar/iChatAI---Open-Source-AI-Chatbot-using-Gemini-API/blob/a4aad98a17a741431a10882f6fa6007bf40ff2f9/API%20key%20directory.jpg)
-=======
-# iChatAI---Open-Source-AI-Chatbot-using-Gemini-API
-iChatAI is a smart, lightweight, and fully customizable AI chatbot application powered by Gemini APIs. Designed with user experience in mind, iChatAI brings the power of conversational AI to mobile and web platforms in a clean and intuitive interface.
->>>>>>> 4408745 (Initial commit)
+## 🛠️ Installation
+```bash
+git clone https://github.com/yourusername/ichatai.git
+cd ichatai
+# Add steps to set up API keys and run
