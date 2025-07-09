@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "662619264204",
+    "project_id": "ichatai-950fc",
+    "storage_bucket": "ichatai-950fc.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:662619264204:android:632bf8e8e80eb2e3091e69",
+        "android_client_info": {
+          "package_name": "com.zafar.ichatai"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "662619264204-n5rcs9n2b9mkmaj2iltf2ji6nbrh0anr.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.zafar.ichatai",
+            "certificate_hash": "d455d367d13b0fc4ecda5cea8dea854bd8e95143"
+          }
+        },
+        {
+          "client_id": "662619264204-6iojmq98nv1r5qetv9sjbvcl0heun2ik.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCW8e-6rxeH8YHPaICaxic7MEHsa9MQuac"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "662619264204-6iojmq98nv1r5qetv9sjbvcl0heun2ik.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

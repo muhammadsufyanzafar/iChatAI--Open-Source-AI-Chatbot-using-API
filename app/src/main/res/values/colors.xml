@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+    <color name="neon_purple">#BC13FE</color>
+    <color name="primary_shrine_pink">#FEDBD0</color>
+    <color name="dark_pink">#FF0266</color>
+    <color name="twilight">#674fa3</color>
+    <color name="blush">#ff9983</color>
+
+</resources>
