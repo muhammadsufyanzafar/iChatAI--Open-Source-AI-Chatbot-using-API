@@ -29,10 +29,5 @@ iChatAI is a smart, lightweight, and fully customizable AI chatbot application p
 
 ---
 
-## 🛠️ Installation
-```bash
-git clone https://github.com/muhammadsufyanzafar/ichatai.git
-cd ichatai
-Insert your API key here:
+## Insert your API key here:
 ![API key directory](https://github.com/muhammadsufyanzafar/iChatAI---Open-Source-AI-Chatbot-using-Gemini-API/blob/a4aad98a17a741431a10882f6fa6007bf40ff2f9/API%20key%20directory.jpg)
-
