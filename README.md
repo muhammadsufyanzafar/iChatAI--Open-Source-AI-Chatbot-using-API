@@ -58,7 +58,7 @@ You will need to download **Git** and **Node** to run this project.
 
 - Download and install Android Studio from the official website: [Android Studio](https://developer.android.com/studio/)
 - Make sure you have the latest version of Git on your computer.
-  ```
+  ---
 
 # Getting Started 🎯
 
