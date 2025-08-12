@@ -3,7 +3,7 @@
 Welcome to **iChatAI**, a sleek and powerful AI chatbot built using **OpenAI** / **Gemini API**, designed for seamless integration and intelligent conversations.
 iChatAI is a smart, lightweight, and fully customizable AI chatbot application powered by Gemini APIs. Designed with user experience in mind, iChatAI brings the power of conversational AI to mobile and web platforms in a clean and intuitive interface
 
-![iChatAI logo](https://drive.google.com/file/d/1lKwVzsD3Xvm5m8X3Cam4WqLaKS7dUv2x/view?usp=drive_link)
+![iChatAI logo](https://i.postimg.cc/ZqNmpWb8/ichatailogo.png)
 
 ---
 
@@ -19,18 +19,88 @@ iChatAI is a smart, lightweight, and fully customizable AI chatbot application p
 ## 📸 Screenshots
 | S 1 | S 2 | S 3 |
 |--------|----------------|-------------------|
-| ![](https://drive.google.com/file/d/1hUfaYUjE14PsQJLBBDsJoMzchrUMlEWX/view?usp=drive_link) | ![](https://drive.google.com/file/d/1c4DqDffNrncIWUwZ-SmuzgT5GNAKL4_k/view?usp=drive_link) | ![](https://drive.google.com/file/d/1yY0JHsp7V-IO_15kjv8-7QgVCnVT84RR/view?usp=drive_link) |
+| ![](https://i.postimg.cc/0QCL0mLw/i-Chat-AI-S.jpg) | ![](https://i.postimg.cc/sDLbm30w/i-Chat-AI-S3.jpg) | ![](https://i.postimg.cc/fLMPyyJT/i-Chat-AI-S1.jpg) |
 
 ---
 
-## 📦 Tech Stack
-- Dart / Java / Kotlin / Flutter / React Native
-- Firebase / SQLite / Shared Preferences (if any)
-- OpenAI / Gemini APIs
+## ✨ Features
+
+- **Responsive UI/UX** with Java
+- Project showcase with live demos and GitHub links
+- Mobile-friendly layout and user-friendly
+- Connected with Firebase
+- Admob integrated
 
 ---
 
-## 🛠️ Installation
+## Installation ⬇️
+
+You will need to download **Git** and **Node** to run this project.
+
+### Git
+
+- Download and install Git from the official website: [Git Downloads](https://git-scm.com/)
+- Verify the installation:
+  ```bash
+  git --version
+  ```
+
+### JDK
+
+- Download and installJDK from the official website: [JDK](https://www.oracle.com/java/technologies/downloads/)
+- Make sure you have the latest version of Git and JDK on your computer.
+- Verify the installation:
+  ```bash
+  java -version
+  ```
+
+### Android Studio
+
+- Download and install Android Studio from the official website: [Android Studio](https://developer.android.com/studio/)
+- Make sure you have the latest version of Git on your computer.
+  
+  ```
+
+# Getting Started 🎯
+
+### Fork and Clone the Repository 🚀
+1. Click the **Fork** button at the top-right corner of the page to create your own copy of the repository.
+2. After forking, open your terminal and run the following commands to clone the repo:
+
+  ```bash
+  git clone https://github.com/muhammadsufyanzafar/ichatai.git
+  ```
+Navigate to the Project Directory 📂
+Once the repository is cloned, change your directory to the project folder:
 ```bash
-git clone https://github.com/muhammadsufyanzafar/ichatai.git
 cd ichatai
+```
+
+Install Dependencies ⚙️
+From the root directory of your project, install the necessary packages:
+```bash
+npm install
+```
+
+Run the Project on Android Studio 🚀
+Start the Android Studio to see your project:
+```bash
+npm run dev
+```
+
+
+### 🤝 Contributing
+
+1. Fork the Project
+2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the Branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
+
+## 📌 License
+
+This project is open-source and free to use under the [MIT License](LICENSE).
+
+---
+
+> Designed and developed with ❤️ by Muhammad Sufyan Zafar
