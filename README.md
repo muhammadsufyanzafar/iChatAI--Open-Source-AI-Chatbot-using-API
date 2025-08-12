@@ -12,7 +12,7 @@ iChatAI is a smart, lightweight, and fully customizable AI chatbot application p
 - 🧠 Handles real-time conversations
 - 💬 Clean UI & responsive design
 - 🔧 Easy to configure and deploy
-- 🌍 Built with Flutter / React Native / Kotlin (add your tech stack)
+- 🌍 Built with Android Studio using Java
 
 ---
 
