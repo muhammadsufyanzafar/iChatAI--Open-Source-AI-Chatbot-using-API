@@ -25,7 +25,6 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.MobileAds;
 import com.google.android.gms.ads.rewarded.RewardedAd;
 import com.google.android.gms.ads.rewarded.RewardedAdLoadCallback;
@@ -62,7 +61,6 @@ public class MainActivity extends AppCompatActivity {
         // Initialize AdMob
         MobileAds.initialize(this, initializationStatus -> {});
 
-
         // Load Rewarded Ad
         loadRewardedAd();
 
@@ -91,7 +89,7 @@ public class MainActivity extends AppCompatActivity {
             sendQueryButtonClickCount++;
             if (sendQueryButtonClickCount == 3 && rewardedAd != null) {
                 showRewardedAd(queryEditText, responseTextView, copyButton, progressBar);
-                sendQueryButtonClickCount = 0; // Reset the click count after showing the ad
+                sendQueryButtonClickCount = 0; // Reset after showing the ad path
             } else {
                 sendQuery(queryEditText, responseTextView, copyButton, progressBar);
             }
@@ -112,7 +110,20 @@ public class MainActivity extends AppCompatActivity {
         registerReceiver(networkReceiver, filter);
     }
 
+    // Show rewarded ad, then proceed to send the query once user earns the reward.
     private void showRewardedAd(TextInputEditText queryEditText, TextView responseTextView, ImageButton copyButton, ProgressBar progressBar) {
+        if (rewardedAd != null) {
+            rewardedAd.show(this, rewardItem -> {
+                // After reward, call sendQuery
+                sendQuery(queryEditText, responseTextView, copyButton, progressBar);
+                // Preload next ad
+                loadRewardedAd();
+            });
+        } else {
+            // Fallback: just send the query if ad isn't ready
+            sendQuery(queryEditText, responseTextView, copyButton, progressBar);
+            Log.d("MainActivity", "Rewarded ad not ready; proceeding without ad.");
+        }
     }
 
     private void loadRewardedAd() {
@@ -128,7 +139,6 @@ public class MainActivity extends AppCompatActivity {
     private void showRewardedAd() {
         if (rewardedAd != null) {
             rewardedAd.show(this, rewardItem -> {
-                // Handle the reward logic if needed
                 // Load the next rewarded ad
                 loadRewardedAd();
             });
@@ -138,7 +148,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void sendQuery(TextInputEditText queryEditText, TextView responseTextView, ImageButton copyButton, ProgressBar progressBar) {
-        GeminiPro model = new GeminiPro();
+        DeepSeekClient model = new DeepSeekClient();
         String query = queryEditText.getText().toString();
         progressBar.setVisibility(View.VISIBLE);
 
@@ -149,16 +159,20 @@ public class MainActivity extends AppCompatActivity {
             model.getResponse(query, new ResponseCallback() {
                 @Override
                 public void onResponse(String response) {
-                    responseTextView.setText(response);
-                    progressBar.setVisibility(View.GONE);
-                    copyButton.setVisibility(response.isEmpty() ? View.GONE : View.VISIBLE);
+                    runOnUiThread(() -> {
+                        responseTextView.setText(response);
+                        progressBar.setVisibility(View.GONE);
+                        copyButton.setVisibility(response.isEmpty() ? View.GONE : View.VISIBLE);
+                    });
                 }
 
                 @Override
                 public void onError(Throwable throwable) {
-                    Toast.makeText(MainActivity.this, "Error: " + throwable.getMessage(), Toast.LENGTH_SHORT).show();
-                    progressBar.setVisibility(View.GONE);
-                    copyButton.setVisibility(View.GONE);
+                    runOnUiThread(() -> {
+                        Toast.makeText(MainActivity.this, "Error: " + throwable.getMessage(), Toast.LENGTH_SHORT).show();
+                        progressBar.setVisibility(View.GONE);
+                        copyButton.setVisibility(View.GONE);
+                    });
                 }
             });
         } catch (Exception e) {
@@ -175,7 +189,9 @@ public class MainActivity extends AppCompatActivity {
         // Unregister the network receiver
         unregisterReceiver(networkReceiver);
         // Remove callbacks to avoid memory leaks
-        handler.removeCallbacksAndMessages(null);
+        if (handler != null) {
+            handler.removeCallbacksAndMessages(null);
+        }
     }
 
     @Override
