@@ -1,14 +1,14 @@
 # 🤖 **iChatAI - Smart AI Chatbot (Open Source)**
 
-Welcome to **iChatAI**, a sleek and powerful AI chatbot built using **Gemini API**, designed for seamless integration and intelligent conversations.
-iChatAI is a smart, lightweight, and fully customizable AI chatbot application powered by Gemini APIs. Designed with user experience in mind, iChatAI brings the power of conversational AI to mobile and web platforms in a clean and intuitive interface
+Welcome to **iChatAI**, a sleek and powerful AI chatbot built using **DeepSeek API**, designed for seamless integration and intelligent conversations.
+iChatAI is a smart, lightweight, and fully customizable AI chatbot application powered by DeepSeek APIs. Designed with user experience in mind, iChatAI brings the power of conversational AI to mobile and web platforms in a clean and intuitive interface
 
 ![iChatAI logo](https://i.postimg.cc/ZqNmpWb8/ichatailogo.png)
 
 ---
 
 ## 🚀 Features
-- 🔥 Chat with AI using Gemini APIs
+- 🔥 Chat with AI using DeepSeek APIs
 - 🧠 Handles real-time conversations
 - 💬 Clean UI & responsive design
 - 🔧 Easy to configure and deploy
