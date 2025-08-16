@@ -67,7 +67,7 @@ You will need to download **Git**, **JDK** & *Android Studio* to run this projec
 2. After forking, open your terminal and run the following commands to clone the repo:
 
   ```bash
-  git clone https://github.com/muhammadsufyanzafar/ichatai.git
+  git clone https://github.com/muhammadsufyanzafar/iChatAI--Open-Source-AI-Chatbot-using-API.git
   ```
 Navigate to the Project Directory 📂
 Once the repository is cloned, change your directory to the project folder:
