@@ -1,7 +1,21 @@
-<resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Base application theme. -->
-    <style name="Base.Theme.IChatAI" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- Customize your dark theme here. -->
-        <!-- <item name="colorPrimary">@color/my_dark_primary</item> -->
+<resources>
+    <style name="Theme.IChatAI" parent="Theme.Material3.DayNight.NoActionBar">
+        <!-- Core colors -->
+        <item name="android:windowBackground">@color/colorBackground</item>
+        <item name="colorSurface">@color/colorSurface</item>
+        <item name="colorOnBackground">@color/colorOnBackground</item>
+        <item name="colorOnSurface">@color/colorOnSurface</item>
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorOnPrimary">@color/colorOnPrimary</item>
+        <item name="colorOutline">@color/colorOutline</item>
+
+        <!-- System bars -->
+        <item name="android:statusBarColor">@color/colorBackground</item>
+        <item name="android:navigationBarColor">@color/colorBackground</item>
+    </style>
+
+    <style name="Theme.iChatAI.Splash" parent="Theme.IChatAI">
+        <item name="android:windowBackground">@color/colorBackground</item>
+        <item name="colorOnBackground">@color/white</item>
     </style>
 </resources>

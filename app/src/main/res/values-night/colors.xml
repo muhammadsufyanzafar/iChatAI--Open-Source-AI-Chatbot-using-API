@@ -1,0 +1,21 @@
+<resources>
+    <!-- Backgrounds -->
+    <color name="colorBackground">#121212</color>
+    <color name="colorSurface">#1E1E1E</color>
+    <color name="colorSurfaceVariant">#2A2A2A</color>
+
+    <!-- Text -->
+    <color name="colorOnBackground">#FFFFFF</color>
+    <color name="colorOnSurface">#FFFFFF</color>
+
+    <!-- Accent / Primary -->
+    <color name="colorPrimary">#BB86FC</color>
+    <color name="colorOnPrimary">#000000</color>
+
+    <!-- Dividers / subtle lines -->
+    <color name="colorOutline">#33FFFFFF</color>
+
+    <color name="neon_purple">#9C27B0</color> <!-- keep same or use a night variant -->
+    <color name="white">#FFFFFF</color>       <!-- pure white still fine in dark mode -->
+
+</resources>

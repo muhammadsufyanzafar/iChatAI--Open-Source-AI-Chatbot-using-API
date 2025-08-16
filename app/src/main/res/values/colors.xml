@@ -1,11 +1,21 @@
-<?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="black">#FF000000</color>
-    <color name="white">#FFFFFFFF</color>
-    <color name="neon_purple">#BC13FE</color>
-    <color name="primary_shrine_pink">#FEDBD0</color>
-    <color name="dark_pink">#FF0266</color>
-    <color name="twilight">#674fa3</color>
-    <color name="blush">#ff9983</color>
+    <!-- Backgrounds -->
+    <color name="colorBackground">#FFFFFF</color>
+    <color name="colorSurface">#F5F5F5</color>
+    <color name="colorSurfaceVariant">#EEEEEE</color>
+
+    <!-- Text -->
+    <color name="colorOnBackground">#000000</color>
+    <color name="colorOnSurface">#000000</color>
+
+    <!-- Accent / Primary -->
+    <color name="colorPrimary">#6200EE</color>
+    <color name="colorOnPrimary">#FFFFFF</color>
+
+    <!-- Dividers / subtle lines -->
+    <color name="colorOutline">#1F000000</color>
+
+    <color name="neon_purple">#9C27B0</color> <!-- or your preferred purple -->
+    <color name="white">#FFFFFF</color>
 
 </resources>
