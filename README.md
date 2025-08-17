@@ -1,11 +1,11 @@
 # 🤖 **iChatAI - Smart AI Chatbot (Open Source)**
 
+Welcome to **iChatAI**, a sleek and powerful AI chatbot built using **DeepSeek API**, designed for seamless integration and intelligent conversations.
+iChatAI is a smart, lightweight, and fully customizable AI chatbot application powered by DeepSeek APIs. Designed with user experience in mind, iChatAI brings the power of conversational AI to mobile and web platforms in a clean and intuitive interface
+
 ```Note
 I am currently working on this project and the new updates will be live soon on github.
   ```
-
-Welcome to **iChatAI**, a sleek and powerful AI chatbot built using **DeepSeek API**, designed for seamless integration and intelligent conversations.
-iChatAI is a smart, lightweight, and fully customizable AI chatbot application powered by DeepSeek APIs. Designed with user experience in mind, iChatAI brings the power of conversational AI to mobile and web platforms in a clean and intuitive interface
 
 ![iChatAI logo](https://i.postimg.cc/ZqNmpWb8/ichatailogo.png)
 
