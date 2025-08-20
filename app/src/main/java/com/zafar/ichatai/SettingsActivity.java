@@ -84,9 +84,9 @@ public class SettingsActivity extends AppCompatActivity {
 
         // About links (replace URLs with your live pages)
         findViewById(R.id.rowTerms).setOnClickListener(v ->
-                openLink("https://your-website.com/terms"));
+                openLink("https://onlineshoppingdealofficial.blogspot.com/p/ichatais-terms-conditions.html"));
         findViewById(R.id.rowPrivacy).setOnClickListener(v ->
-                openLink("https://your-website.com/privacy"));
+                openLink("https://onlineshoppingdealofficial.blogspot.com/p/ichatais-privacy-policy.html"));
         findViewById(R.id.rowContact).setOnClickListener(v ->
                 openLink("https://muhammadsufyanzafar.github.io/portfolio/#contact"));
     }
