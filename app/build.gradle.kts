@@ -61,4 +61,7 @@ dependencies {
     annotationProcessor("androidx.room:room-compiler:2.6.1")
 
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.4")
+
+    // ADD THIS LINE for Markdown rendering
+    implementation("io.noties.markwon:core:4.6.2")
 }

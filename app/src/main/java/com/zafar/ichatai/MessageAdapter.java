@@ -12,6 +12,9 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+// Import the Markwon library
+import io.noties.markwon.Markwon;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,9 +23,12 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     private static final int TYPE_USER = 1;
     private static final int TYPE_AI = 2;
 
-    private final List<com.zafar.ichatai.Message> messages = new ArrayList<>();
+    private final List<Message> messages = new ArrayList<>();
 
-    public void addMessage(com.zafar.ichatai.Message message) {
+    // Create a Markwon instance to reuse
+    private Markwon markwon;
+
+    public void addMessage(Message message) {
         messages.add(message);
         notifyItemInserted(messages.size() - 1);
     }
@@ -30,13 +36,13 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     public void replaceLastAiMessage(String newText) {
         for (int i = messages.size() - 1; i >= 0; i--) {
             if (!messages.get(i).isUser()) {
-                messages.set(i, new com.zafar.ichatai.Message(newText, false));
+                messages.set(i, new Message(newText, false));
                 notifyItemChanged(i);
                 return;
             }
         }
         // If not found, just add
-        addMessage(new com.zafar.ichatai.Message(newText, false));
+        addMessage(new Message(newText, false));
     }
 
     @Override
@@ -52,6 +58,11 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     @NonNull
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        // Initialize Markwon here, once, using the parent's context
+        if (markwon == null) {
+            markwon = Markwon.create(parent.getContext());
+        }
+
         if (viewType == TYPE_USER) {
             View v = LayoutInflater.from(parent.getContext())
                     .inflate(R.layout.item_message_user, parent, false);
@@ -65,12 +76,14 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
 
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
-        com.zafar.ichatai.Message m = messages.get(position);
+        Message m = messages.get(position);
         if (holder instanceof UserHolder) {
-            ((UserHolder) holder).txt.setText(m.getText());
+            // Use Markwon to set the text
+            markwon.setMarkdown(((UserHolder) holder).txt, m.getText());
             makeCopyable(holder.itemView.getContext(), ((UserHolder) holder).txt);
         } else if (holder instanceof AiHolder) {
-            ((AiHolder) holder).txt.setText(m.getText());
+            // Use Markwon to set the text
+            markwon.setMarkdown(((AiHolder) holder).txt, m.getText());
             makeCopyable(holder.itemView.getContext(), ((AiHolder) holder).txt);
         }
     }
@@ -87,6 +100,16 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
             }
             return true;
         });
+    }
+
+    public List<Message> getMessages() {
+        return new ArrayList<>(messages);
+    }
+
+    public void setMessages(List<Message> newMessages) {
+        messages.clear();
+        messages.addAll(newMessages);
+        notifyDataSetChanged();
     }
 
     static class UserHolder extends RecyclerView.ViewHolder {

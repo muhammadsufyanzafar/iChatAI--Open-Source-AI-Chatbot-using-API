@@ -13,15 +13,23 @@
         android:orientation="horizontal">
 
         <LinearLayout
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_weight="1"
             android:background="@drawable/bg_message_user"
-            android:padding="12dp">
+            android:padding="12dp"
+            android:maxWidth="0dp"
+            android:layout_gravity="end">
 
             <TextView
                 android:id="@+id/txtMessage"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:ellipsize="none"
+                android:scrollHorizontally="false"
+                android:breakStrategy="simple"
+                android:scrollbars="none"
+                android:lineSpacingExtra="2dp"
                 android:textColor="?attr/colorOnSurface"
                 android:textSize="16sp" />
         </LinearLayout>

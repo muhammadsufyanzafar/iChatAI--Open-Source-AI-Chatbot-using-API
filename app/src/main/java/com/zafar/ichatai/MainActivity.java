@@ -41,11 +41,18 @@ import com.zafar.ichatai.data.local.dao.MessageDao;
 import com.zafar.ichatai.data.local.entity.Chat;
 import com.zafar.ichatai.data.local.entity.ChatMessage;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements ConversationAdapter.Listener {
 
     public static final String ACTION_CREDITS_CHANGED = "com.zafar.ichatai.CREDITS_CHANGED";
+    private static final String STATE_CURRENT_CHAT_ID = "state_current_chat_id";
+    private static final String STATE_CHAT_SAVED = "state_chat_saved";
+    private static final String STATE_HAS_USER_MSG = "state_has_user_msg";
+    private static final String STATE_DRAFT = "state_draft";
+    private static final String STATE_MSG_TEXTS = "state_msg_texts";
+    private static final String STATE_MSG_IS_USER = "state_msg_is_user";
 
     // Drawer + header
     private DrawerLayout drawerLayout;
@@ -79,6 +86,34 @@ public class MainActivity extends AppCompatActivity implements ConversationAdapt
     private CreditsManager credits;
     private final Handler handler = new Handler();
     private boolean interstitialShown = false;
+
+    @Override
+    protected void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        // Basic flags
+        outState.putLong(STATE_CURRENT_CHAT_ID, currentChatId);
+        outState.putBoolean(STATE_CHAT_SAVED, chatSaved);
+        outState.putBoolean(STATE_HAS_USER_MSG, hasAnyUserMessage);
+
+        // Draft in the input
+        String draft = (queryEditText.getText() != null) ? queryEditText.getText().toString() : "";
+        outState.putString(STATE_DRAFT, draft);
+
+        // Serialize visible messages (for unsaved chat sessions)
+        ArrayList<String> texts = new ArrayList<>();
+        ArrayList<Boolean> isUsers = new ArrayList<>();
+        // add a getter in MessageAdapter (see step 3) or keep your own list
+        for (Message m : adapter.getMessages()) {
+            texts.add(m.getText());
+            isUsers.add(m.isUser());
+        }
+        outState.putStringArrayList(STATE_MSG_TEXTS, texts);
+        // convert to primitive boolean[]
+        boolean[] isUserArray = new boolean[isUsers.size()];
+        for (int i = 0; i < isUsers.size(); i++) isUserArray[i] = isUsers.get(i);
+        outState.putBooleanArray(STATE_MSG_IS_USER, isUserArray);
+    }
 
     // Receivers
     private final BroadcastReceiver networkReceiver = new BroadcastReceiver() {
@@ -160,7 +195,12 @@ public class MainActivity extends AppCompatActivity implements ConversationAdapt
                 Toast.makeText(this, "Please wait for the current reply to finish.", Toast.LENGTH_SHORT).show();
                 return;
             }
-            startUnsavedChat();
+            if (savedInstanceState == null) {
+                // first launch only
+                startUnsavedChat();
+            } else {
+                restoreFromState(savedInstanceState);
+            }
         });
 
         // Drawer actions
@@ -223,6 +263,40 @@ public class MainActivity extends AppCompatActivity implements ConversationAdapt
         }, 30_000);
     }
 
+    private void restoreFromState(@NonNull Bundle state) {
+        long restoredId = state.getLong(STATE_CURRENT_CHAT_ID, -1L);
+        chatSaved = state.getBoolean(STATE_CHAT_SAVED, false);
+        hasAnyUserMessage = state.getBoolean(STATE_HAS_USER_MSG, false);
+        setNewChatEnabled(hasAnyUserMessage);
+
+        String draft = state.getString(STATE_DRAFT, "");
+        queryEditText.setText(draft);
+
+        if (chatSaved && restoredId != -1L) {
+            // for saved chats, reload from DB (keeps source of truth)
+            loadMessagesFor(restoredId);  // already implemented
+            return;
+        }
+
+        // otherwise restore the in-memory unsaved session
+        ArrayList<String> texts = state.getStringArrayList(STATE_MSG_TEXTS);
+        boolean[] isUserArray = state.getBooleanArray(STATE_MSG_IS_USER);
+
+        adapter = new MessageAdapter();
+        recyclerView.setAdapter(adapter);
+        if (texts != null && isUserArray != null) {
+            for (int i = 0; i < texts.size() && i < isUserArray.length; i++) {
+                adapter.addMessage(new Message(texts.get(i), isUserArray[i]));
+            }
+        } else {
+            adapter.addMessage(new Message("New chat started. Ask me anything!", false));
+            hasAnyUserMessage = false;
+            setNewChatEnabled(false);
+        }
+        currentChatId = -1;
+        scrollToBottom();
+    }
+
     // Start a new unsaved chat session in UI (no DB writes yet)
     private void startUnsavedChat() {
         adapter = new MessageAdapter();
@@ -261,7 +335,7 @@ public class MainActivity extends AppCompatActivity implements ConversationAdapt
             return;
         }
         updateCreditsUI();
-        sendBroadcast(new Intent(ACTION_CREDITS_CHANGED));
+        sendBroadcast(new Intent(ACTION_CREDITS_CHANGED).setPackage(/* TODO: provide the application ID. For example: */ getPackageName()));
 
         // Add user's message to UI
         adapter.addMessage(new Message(query, true));
