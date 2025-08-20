@@ -1,10 +1,4 @@
 <resources>
     <string name="app_name">iChatAI</string>
     <string name="copy_to_clipboard">Copy to clipboard</string>
-
-    <!-- Ad Test Unit ID ca-app-pub-3940256099942544/9214589741 -->
-
-
-    <!-- Ad Test Unit ID ca-app-pub-3940256099942544/5224354917 -->
-    <string name="interstitial_ad_unit_id">ca-app-pub-4884978624677986/9143435806</string>
 </resources>

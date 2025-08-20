@@ -38,10 +38,9 @@ public class DeepSeekClient {
 
             Request request = new Request.Builder()
                     .url(BASE_URL)
-                    .addHeader("Authorization", "Bearer " + BuildConfig.apiKey)
+                    .addHeader("Authorization", "Bearer " + ApiKeys.OPENROUTER_API_KEY)
                     .addHeader("Accept", "application/json")
                     .addHeader("Content-Type", "application/json")
-                    // Optional but nice to include:
                     .addHeader("HTTP-Referer", "com.zafar.ichataibeta")
                     .addHeader("X-Title", "iChatAI Beta")
                     .post(RequestBody.create(body.toString(), JSON))
@@ -49,9 +48,7 @@ public class DeepSeekClient {
 
             httpClient.newCall(request).enqueue(new Callback() {
                 @Override
-                public void onFailure(Call call, IOException e) {
-                    callback.onError(e);
-                }
+                public void onFailure(Call call, IOException e) { callback.onError(e); }
 
                 @Override
                 public void onResponse(Call call, Response response) throws IOException {

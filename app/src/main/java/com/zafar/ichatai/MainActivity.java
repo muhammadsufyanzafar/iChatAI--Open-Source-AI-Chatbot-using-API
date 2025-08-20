@@ -8,223 +8,419 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import android.util.Log;
-import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
+import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
+import androidx.core.view.GravityCompat;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.MobileAds;
-import com.google.android.gms.ads.rewarded.RewardedAd;
-import com.google.android.gms.ads.rewarded.RewardedAdLoadCallback;
-import com.google.android.material.appbar.MaterialToolbar;
+import com.google.android.material.chip.Chip;
 import com.google.android.material.textfield.TextInputEditText;
+import com.zafar.ichatai.data.local.AppDatabase;
+import com.zafar.ichatai.data.local.dao.ChatDao;
+import com.zafar.ichatai.data.local.dao.MessageDao;
+import com.zafar.ichatai.data.local.entity.Chat;
+import com.zafar.ichatai.data.local.entity.ChatMessage;
 
-public class MainActivity extends AppCompatActivity {
+import java.util.List;
 
-    private final BroadcastReceiver networkReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            if (!NetworkUtil.isConnected(context)) {
-                Toast.makeText(context, "No Internet Connection", Toast.LENGTH_LONG).show();
-            }
-        }
-    };
+public class MainActivity extends AppCompatActivity implements ConversationAdapter.Listener {
 
-    private boolean doubleBackToExitPressedOnce = false;
-    private int sendQueryButtonClickCount = 0;
-    private RewardedAd rewardedAd;
-    private Handler handler;
+    public static final String ACTION_CREDITS_CHANGED = "com.zafar.ichatai.CREDITS_CHANGED";
 
+    // Drawer + header
+    private DrawerLayout drawerLayout;
+    private ImageButton btnMenu, btnNewChat, btnCloseDrawer;
+    private Chip chipCredits;
+    private RecyclerView rvConversations;
+    private TextInputEditText etSearch;
+
+    // Chat UI
     private MessageAdapter adapter;
     private RecyclerView recyclerView;
     private TextInputEditText queryEditText;
     private ImageButton sendButton;
     private ProgressBar progressBar;
 
+    // Data
+    private AppDatabase db;
+    private ChatDao chatDao;
+    private MessageDao messageDao;
+    private ConversationAdapter convAdapter;
+
+    // Current chat tracking
+    private long currentChatId = -1;   // -1 means not yet saved to DB
+    private boolean chatSaved = false; // saved only after first AI reply
+
+    // State
+    private boolean hasAnyUserMessage = false; // enables New Chat after first user send (in this session)
+    private boolean isSending = false;
+
+    // Credits + ads
+    private CreditsManager credits;
+    private final Handler handler = new Handler();
+    private boolean interstitialShown = false;
+
+    // Receivers
+    private final BroadcastReceiver networkReceiver = new BroadcastReceiver() {
+        @Override public void onReceive(Context context, Intent intent) {
+            if (!NetworkUtil.isConnected(context)) {
+                Toast.makeText(context, "No Internet Connection", Toast.LENGTH_LONG).show();
+            }
+        }
+    };
+
+    private final BroadcastReceiver creditsReceiver = new BroadcastReceiver() {
+        @Override public void onReceive(Context context, Intent intent) {
+            updateCreditsUI();
+        }
+    };
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        ThemeUtils.applySavedTheme(this);
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
-        ThemeUtils.applySavedTheme(this);
         setContentView(R.layout.activity_main);
 
-        // Toolbar setup
-        MaterialToolbar toolbar = findViewById(R.id.topAppBar);
-        toolbar.setOnMenuItemClickListener(this::onMenuItemClick);
+        Button crashButton = new Button(this);
+        crashButton.setText("Test Crash");
+        crashButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View view) {
+                throw new RuntimeException("Test Crash"); // Force a crash
+            }
+        });
+
+        addContentView(crashButton, new ViewGroup.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT));
+
+        // DB + prefs
+        db = AppDatabase.get(this);
+        chatDao = db.chatDao();
+        messageDao = db.messageDao();
+        credits = new CreditsManager(this);
 
         // Views
+        drawerLayout = findViewById(R.id.drawerLayout);
+        View mainRoot = findViewById(R.id.main);
+
+        btnMenu = findViewById(R.id.btnMenu);
+        btnNewChat = findViewById(R.id.btnNewChat);
+        chipCredits = findViewById(R.id.chipCredits);
+
         recyclerView = findViewById(R.id.recyclerView);
         queryEditText = findViewById(R.id.queryEditText);
         sendButton = findViewById(R.id.sendPromptButton);
         progressBar = findViewById(R.id.sendPromptProgressBar);
 
-        // RecyclerView setup
+        btnCloseDrawer = findViewById(R.id.btnCloseActivity);
+        rvConversations = findViewById(R.id.rvConversations);
+        etSearch = findViewById(R.id.etSearch);
+        View btnGetCredits = findViewById(R.id.btnGetCredits);
+        View btnSettings = findViewById(R.id.btnSettings);
+
+        // Insets for main root (avoid drawer insets to prevent "pinching")
+        ViewCompat.setOnApplyWindowInsetsListener(mainRoot, (v, insets) -> {
+            Insets ime = insets.getInsets(WindowInsetsCompat.Type.ime());
+            Insets sys = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+            v.setPadding(sys.left, sys.top, sys.right, Math.max(ime.bottom, sys.bottom));
+            return insets;
+        });
+
+        // Drawer behavior: hide/show keyboard and refresh conversations on close
+        drawerLayout.addDrawerListener(new DrawerLayout.SimpleDrawerListener() {
+            @Override public void onDrawerOpened(@NonNull View drawerView) { hideKeyboard(); }
+            @Override public void onDrawerClosed(@NonNull View drawerView) {
+                queryEditText.requestFocus();
+                showKeyboard();
+                if (etSearch.getText() != null && etSearch.getText().length() > 0) {
+                    etSearch.setText("");
+                    loadConversations();
+                }
+            }
+        });
+
+        // Header actions
+        btnMenu.setOnClickListener(v -> drawerLayout.openDrawer(GravityCompat.START));
+        setNewChatEnabled(false);
+        btnNewChat.setOnClickListener(v -> {
+            if (!hasAnyUserMessage) {
+                Toast.makeText(this, "Send your first message before starting a new chat.", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            if (isSending) {
+                Toast.makeText(this, "Please wait for the current reply to finish.", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            startUnsavedChat();
+        });
+
+        // Drawer actions
+        btnCloseDrawer.setOnClickListener(v -> drawerLayout.closeDrawer(GravityCompat.START));
+        btnGetCredits.setOnClickListener(v -> startActivity(new Intent(this, CreditsActivity.class)));
+        btnSettings.setOnClickListener(v -> startActivity(new Intent(this, SettingsActivity.class)));
+
+        // Conversations list
+        rvConversations.setLayoutManager(new LinearLayoutManager(this));
+        convAdapter = new ConversationAdapter(this);
+        rvConversations.setAdapter(convAdapter);
+        etSearch.addTextChangedListener(new SimpleTextWatcher(s -> convAdapter.getFilter().filter(s)));
+
+        // Back closes drawer first
+        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
+            @Override public void handleOnBackPressed() {
+                if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
+                    drawerLayout.closeDrawer(GravityCompat.START);
+                } else {
+                    setEnabled(false);
+                    getOnBackPressedDispatcher().onBackPressed();
+                }
+            }
+        });
+
+        // Messages list
         adapter = new MessageAdapter();
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(adapter);
 
-        // Welcome message
-        adapter.addMessage(new Message("Hi, I’m iChatAI. Ask me anything!", false));
-        scrollToBottom();
+        // Always start a fresh unsaved session
+        startUnsavedChat();
 
-        // AdMob init
-        MobileAds.initialize(this, initializationStatus -> {});
-        loadRewardedAd();
+        // Send logic (credits gated, single-flight while AI replies)
+        sendButton.setOnClickListener(v -> handleSend());
 
-        // Show a rewarded ad after 30 seconds (optional, as before)
-        handler = new Handler();
-        handler.postDelayed(this::showRewardedAd, 30000);
 
-        // Send click
-        sendButton.setOnClickListener(v -> {
-            if (!NetworkUtil.isConnected(this)) {
-                Toast.makeText(this, "No Internet Connection", Toast.LENGTH_LONG).show();
-                return;
-            }
-            String query = queryEditText.getText() != null ? queryEditText.getText().toString().trim() : "";
-            if (query.isEmpty()) {
-                Toast.makeText(this, "Please add your query", Toast.LENGTH_SHORT).show();
-                return;
-            }
+        // Receivers
+        registerReceiver(networkReceiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
+        if (Build.VERSION.SDK_INT >= 33) {
+            registerReceiver(creditsReceiver, new IntentFilter(ACTION_CREDITS_CHANGED), Context.RECEIVER_NOT_EXPORTED);
+        } else {
+            registerReceiver(creditsReceiver, new IntentFilter(ACTION_CREDITS_CHANGED));
+        }
 
-            // Add user message immediately
-            adapter.addMessage(new Message(query, true));
-            scrollToBottom();
-
-            // Ad every 3rd send
-            sendQueryButtonClickCount++;
-            if (sendQueryButtonClickCount == 3 && rewardedAd != null) {
-                showRewardedAdThenSend(query);
-                sendQueryButtonClickCount = 0;
-            } else {
-                sendQuery(query);
-            }
-        });
-
-        // Register network receiver
-        IntentFilter filter = new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);
-        registerReceiver(networkReceiver, filter);
-
-        // Auto-focus + show keyboard on launch
+        // Keyboard
         queryEditText.requestFocus();
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
 
-        // Ensure the bottom bar lifts above the keyboard (works even on quirky devices)
-        View root = findViewById(R.id.main);
-        ViewCompat.setOnApplyWindowInsetsListener(root, (v, insets) -> {
-            Insets ime = insets.getInsets(WindowInsetsCompat.Type.ime());
-            Insets sysBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+        // Load saved conversations in drawer
+        loadConversations();
+        updateCreditsUI();
 
-            int bottom = Math.max(ime.bottom, sysBars.bottom);
-            int top = sysBars.top;
-            int left = sysBars.left;
-            int right = sysBars.right;
-
-            v.setPadding(left, top, right, bottom);
-            return insets;
-        });
+        // Interstitial (optional)
+        AdHelper.warmUp(this);
+        handler.postDelayed(() -> {
+            if (!interstitialShown) {
+                AdHelper.showInterstitial(this, shown -> interstitialShown = true);
+            }
+        }, 30_000);
     }
 
-    private boolean onMenuItemClick(@NonNull MenuItem item) {
-        if (item.getItemId() == R.id.action_settings) {
-            startActivity(new Intent(this, SettingsActivity.class));
-            return true;
+    // Start a new unsaved chat session in UI (no DB writes yet)
+    private void startUnsavedChat() {
+        adapter = new MessageAdapter();
+        recyclerView.setAdapter(adapter);
+        adapter.addMessage(new Message("New chat started. Ask me anything!", false));
+        scrollToBottom();
+        currentChatId = -1;
+        chatSaved = false;
+        hasAnyUserMessage = false;
+        setNewChatEnabled(false);
+    }
+
+    private void handleSend() {
+        if (isSending) {
+            Toast.makeText(this, "Please wait for the current reply to finish.", Toast.LENGTH_SHORT).show();
+            return;
         }
-        return false;
-    }
+        if (!NetworkUtil.isConnected(this)) {
+            Toast.makeText(this, "No Internet Connection", Toast.LENGTH_LONG).show();
+            return;
+        }
+        String query = queryEditText.getText() != null ? queryEditText.getText().toString().trim() : "";
+        if (query.isEmpty()) {
+            Toast.makeText(this, "Please add your query", Toast.LENGTH_SHORT).show();
+            return;
+        }
 
+        // Credits
+        if (!credits.spend(1)) {
+            new AlertDialog.Builder(this)
+                    .setTitle("Out of credits")
+                    .setMessage("Watch a short ad to earn 5 credits and continue.")
+                    .setPositiveButton("Get credits", (d, w) -> startActivity(new Intent(this, CreditsActivity.class)))
+                    .setNegativeButton("Cancel", null)
+                    .show();
+            return;
+        }
+        updateCreditsUI();
+        sendBroadcast(new Intent(ACTION_CREDITS_CHANGED));
 
-    private void loadRewardedAd() {
-        AdRequest adRequest = new AdRequest.Builder().build();
-        RewardedAd.load(this, getString(R.string.interstitial_ad_unit_id), adRequest, new RewardedAdLoadCallback() {
+        // Add user's message to UI
+        adapter.addMessage(new Message(query, true));
+        hasAnyUserMessage = true;
+        setNewChatEnabled(true);
+        scrollToBottom();
+        queryEditText.setText("");
+
+        // Save user message immediately if chat already exists (later turns)
+        if (chatSaved && currentChatId != -1) {
+            saveUserMessage(currentChatId, query);
+        }
+
+        // Lock until AI responds
+        setSending(true);
+        adapter.addMessage(new Message("Thinking…", false));
+        scrollToBottom();
+
+        // AI call
+        DeepSeekClient model = new DeepSeekClient();
+        progressBar.setVisibility(View.VISIBLE);
+        model.getResponse(query, new ResponseCallback() {
             @Override
-            public void onAdLoaded(RewardedAd ad) {
-                rewardedAd = ad;
+            public void onResponse(String response) {
+                runOnUiThread(() -> {
+                    String content = (response == null || response.isEmpty()) ? "..." : response;
+                    adapter.replaceLastAiMessage(content);
+                    progressBar.setVisibility(View.GONE);
+                    setSending(false);
+                    scrollToBottom();
+                    copyLastToClipboardIfLong(content);
+
+                    // Persist chat only after first round completes (first turn)
+                    if (!chatSaved) {
+                        saveFirstRoundToDb(query, content);
+                    } else {
+                        // Subsequent turns: save AI message only (user already saved above)
+                        saveAiMessage(currentChatId, content);
+                    }
+                });
+            }
+
+            @Override
+            public void onError(Throwable throwable) {
+                runOnUiThread(() -> {
+                    adapter.replaceLastAiMessage("Sorry, I ran into an error: " + throwable.getMessage());
+                    progressBar.setVisibility(View.GONE);
+                    setSending(false);
+                    scrollToBottom();
+                });
             }
         });
     }
 
-    private void showRewardedAd() {
-        if (rewardedAd != null) {
-            rewardedAd.show(this, rewardItem -> loadRewardedAd());
-        } else {
-            Log.d("MainActivity", "Rewarded ad not ready yet.");
-        }
+    // Persist the first user+AI messages together and title the chat
+    private void saveFirstRoundToDb(String userText, String aiText) {
+        new Thread(() -> {
+            try {
+                long now = System.currentTimeMillis();
+                db.runInTransaction(() -> {
+                    // Title from first user message (trimmed to 40 chars)
+                    String title = userText.trim();
+                    if (title.length() > 40) title = title.substring(0, 40) + "…";
+
+                    long newId = chatDao.insert(new Chat(title, now));
+                    currentChatId = newId;
+
+                    messageDao.insert(new ChatMessage(newId, true, userText, now));
+                    messageDao.insert(new ChatMessage(newId, false, aiText, now));
+                });
+                chatSaved = true;
+                runOnUiThread(this::loadConversationsClearingSearch);
+            } catch (Exception ignored) {
+                // If persisting fails, UI session remains; you can show a toast if desired.
+            }
+        }).start();
     }
 
-    private void showRewardedAdThenSend(String query) {
-        if (rewardedAd != null) {
-            rewardedAd.show(this, rewardItem -> {
-                loadRewardedAd();
-                sendQuery(query);
-            });
-        } else {
-            Log.d("MainActivity", "Rewarded ad not ready; sending query anyway.");
-            sendQuery(query);
-        }
+    private void saveUserMessage(long chatId, String content) {
+        new Thread(() ->
+                messageDao.insert(new ChatMessage(chatId, true, content, System.currentTimeMillis()))
+        ).start();
     }
 
-    private void sendQuery(String query) {
-        queryEditText.setText("");
-        progressBar.setVisibility(View.VISIBLE);
+    private void saveAiMessage(long chatId, String content) {
+        new Thread(() -> messageDao.insert(new ChatMessage(chatId, false, content, System.currentTimeMillis()))).start();
+    }
 
-        // Local identity check so “who are you” always answers as iChatAI
-        String normalized = query.toLowerCase();
-        if (normalized.equals("who are you") || normalized.equals("who are u")
-                || normalized.equals("what is your name") || normalized.equals("tell me your name")) {
-            adapter.addMessage(new Message("I am iChatAI — your friendly AI companion.", false));
-            progressBar.setVisibility(View.GONE);
-            scrollToBottom();
+    private void loadMessagesFor(long chatId) {
+        if (isSending) {
+            Toast.makeText(this, "Please wait for the current reply to finish.", Toast.LENGTH_SHORT).show();
             return;
         }
-
-        // Temporary typing indicator
-        adapter.addMessage(new Message("Thinking…", false));
-        scrollToBottom();
-
-        DeepSeekClient model = new DeepSeekClient();
-        try {
-            model.getResponse(query, new ResponseCallback() {
-                @Override
-                public void onResponse(String response) {
-                    runOnUiThread(() -> {
-                        adapter.replaceLastAiMessage(response == null || response.isEmpty() ? "..." : response);
-                        progressBar.setVisibility(View.GONE);
-                        scrollToBottom();
-                        copyLastToClipboardIfLong(response);
-                    });
+        new Thread(() -> {
+            List<ChatMessage> messages = messageDao.getByChat(chatId);
+            runOnUiThread(() -> {
+                adapter = new MessageAdapter();
+                recyclerView.setAdapter(adapter);
+                if (messages == null || messages.isEmpty()) {
+                    adapter.addMessage(new Message("New chat started. Ask me anything!", false));
+                } else {
+                    for (ChatMessage m : messages) {
+                        adapter.addMessage(new Message(m.content, m.isUser));
+                    }
                 }
-
-                @Override
-                public void onError(Throwable throwable) {
-                    runOnUiThread(() -> {
-                        adapter.replaceLastAiMessage("Sorry, I ran into an error: " + throwable.getMessage());
-                        progressBar.setVisibility(View.GONE);
-                        scrollToBottom();
-                    });
-                }
+                scrollToBottom();
+                // This is a saved chat; allow new chat creation (user already sent before)
+                hasAnyUserMessage = true;
+                setNewChatEnabled(true);
+                chatSaved = true;
+                currentChatId = chatId;
             });
-        } catch (Exception e) {
-            Log.e("MainActivity", "Error sending query", e);
-            adapter.replaceLastAiMessage("An error occurred while sending the query.");
-            progressBar.setVisibility(View.GONE);
-            scrollToBottom();
+        }).start();
+    }
+
+    private void loadConversations() {
+        new Thread(() -> {
+            List<Chat> chats = chatDao.getAll();
+            runOnUiThread(() -> convAdapter.setItems(chats));
+        }).start();
+        updateCreditsUI();
+    }
+
+    private void loadConversationsClearingSearch() {
+        if (etSearch.getText() != null && etSearch.getText().length() > 0) {
+            etSearch.setText("");
         }
+        loadConversations();
+    }
+
+    private void updateCreditsUI() {
+        chipCredits.setText(String.valueOf(credits.get()));
+    }
+
+    private void setNewChatEnabled(boolean enabled) {
+        btnNewChat.setEnabled(enabled);
+        btnNewChat.setAlpha(enabled ? 1f : 0.45f);
+    }
+
+    private void setSending(boolean sending) {
+        isSending = sending;
+        sendButton.setEnabled(!sending);
+        queryEditText.setEnabled(!sending);
+    }
+
+    private void scrollToBottom() {
+        recyclerView.post(() -> recyclerView.scrollToPosition(Math.max(0, adapter.getItemCount() - 1)));
     }
 
     private void copyLastToClipboardIfLong(String text) {
@@ -236,34 +432,88 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void scrollToBottom() {
-        recyclerView.post(() -> recyclerView.scrollToPosition(Math.max(0, adapter.getItemCount() - 1)));
+    private void hideKeyboard() {
+        View view = getCurrentFocus();
+        if (view != null) {
+            InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+            if (imm != null) imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+        }
+    }
+
+    private void showKeyboard() {
+        queryEditText.post(() -> {
+            InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+            if (imm != null) imm.showSoftInput(queryEditText, InputMethodManager.SHOW_IMPLICIT);
+        });
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        updateCreditsUI();
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        unregisterReceiver(networkReceiver);
-        if (handler != null) handler.removeCallbacksAndMessages(null);
+        try { unregisterReceiver(networkReceiver); } catch (Exception ignored) {}
+        try { unregisterReceiver(creditsReceiver); } catch (Exception ignored) {}
+        handler.removeCallbacksAndMessages(null);
+    }
+
+    // Drawer callbacks
+    @Override
+    public void onChatClicked(@NonNull Chat chat) {
+        drawerLayout.closeDrawer(GravityCompat.START);
+        loadMessagesFor(chat.id);
     }
 
     @Override
-    public void onBackPressed() {
-        if (doubleBackToExitPressedOnce) {
-            super.onBackPressed();
+    public void onRename(Chat chat) {
+        View dialog = getLayoutInflater().inflate(R.layout.dialog_rename_chat, null);
+        TextInputEditText et = dialog.findViewById(R.id.etTitle);
+        et.setText(chat.title);
+        new AlertDialog.Builder(this)
+                .setTitle("Rename chat")
+                .setView(dialog)
+                .setPositiveButton("Save", (d, w) -> {
+                    String newTitle = et.getText() != null ? et.getText().toString().trim() : "";
+                    if (!newTitle.isEmpty()) {
+                        new Thread(() -> {
+                            chatDao.updateTitle(chat.id, newTitle);
+                            runOnUiThread(this::loadConversationsClearingSearch);
+                        }).start();
+                    }
+                })
+                .setNegativeButton("Cancel", null)
+                .show();
+    }
+
+    @Override
+    public void onDelete(Chat chat) {
+        if (isSending) {
+            Toast.makeText(this, "Please wait for the current reply to finish.", Toast.LENGTH_SHORT).show();
             return;
         }
-        this.doubleBackToExitPressedOnce = true;
-        Toast.makeText(this, "Press again to exit", Toast.LENGTH_SHORT).show();
-        new Handler().postDelayed(() -> doubleBackToExitPressedOnce = false, 2000);
+        new AlertDialog.Builder(this)
+                .setTitle("Delete chat")
+                .setMessage("This will delete the chat and its messages.")
+                .setPositiveButton("Delete", (d, w) -> {
+                    new Thread(() -> {
+                        chatDao.deleteById(chat.id);
+                        runOnUiThread(this::loadConversationsClearingSearch);
+                    }).start();
+                })
+                .setNegativeButton("Cancel", null)
+                .show();
     }
 }
 
-// Utility class to check network connectivity
+// Connectivity util
 class NetworkUtil {
     public static boolean isConnected(Context context) {
-        ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
-        return networkInfo != null && networkInfo.isConnected();
+        ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo n = cm.getActiveNetworkInfo();
+        return n != null && n.isConnected();
     }
 }
