@@ -102,18 +102,6 @@ public class MainActivity extends AppCompatActivity implements ConversationAdapt
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
 
-        Button crashButton = new Button(this);
-        crashButton.setText("Test Crash");
-        crashButton.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View view) {
-                throw new RuntimeException("Test Crash"); // Force a crash
-            }
-        });
-
-        addContentView(crashButton, new ViewGroup.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT));
-
         // DB + prefs
         db = AppDatabase.get(this);
         chatDao = db.chatDao();

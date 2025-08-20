@@ -1,7 +1,6 @@
 plugins {
     id("com.android.application")
     id("com.google.gms.google-services")
-    id("com.google.firebase.crashlytics") version "3.0.6" apply false
 }
 
 android {
@@ -49,7 +48,6 @@ dependencies {
     // Firebase BoM and Analytics
     implementation(platform("com.google.firebase:firebase-bom:33.1.0"))
     implementation("com.google.firebase:firebase-analytics")
-    implementation("com.google.firebase:firebase-crashlytics-ndk")
 
     // Google Mobile Ads
     implementation("com.google.android.gms:play-services-ads:23.1.0")

@@ -143,17 +143,6 @@
             android:layout_margin="8dp"
             app:layout_constraintBottom_toTopOf="@id/inputContainer"
             app:layout_constraintEnd_toEndOf="parent" />
-
-        <Button
-            android:id="@+id/crashButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:onClick="onButtonClick"
-            android:text="Crash Button"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <!-- Drawer content -->
