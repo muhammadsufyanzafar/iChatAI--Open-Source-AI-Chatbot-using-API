@@ -110,7 +110,7 @@ npm install
 ### 7. Paste your API Key
 - Navigate to app/src\/main/java/com/zafar/ichatai/ApiKeys.java
 - Paste your API key there
-- ![](https://i.postimg.cc/bN49jcjx/Screenshot-2025-08-23-115632.jpg)
+  ![](https://i.postimg.cc/bN49jcjx/Screenshot-2025-08-23-115632.jpg)
 
 ### 7. Run the App
 - Connect a physical device via USB (with USB Debugging enabled) OR
