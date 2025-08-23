@@ -7,7 +7,7 @@ iChatAI is a smart, lightweight, and fully customizable AI chatbot application p
 I am currently working on this project and the new updates will be live soon on github.
   ```
 
-![iChatAI logo](https://i.postimg.cc/ZqNmpWb8/ichatailogo.png)
+![iChatAI logo](https://i.postimg.cc/J4mgJkFD/icon.png)
 
 ---
 
@@ -23,7 +23,7 @@ I am currently working on this project and the new updates will be live soon on 
 ## 📸 Screenshots
 | S 1 | S 2 | S 3 |
 |--------|----------------|-------------------|
-| ![](https://i.postimg.cc/0QCL0mLw/i-Chat-AI-S.jpg) | ![](https://i.postimg.cc/sDLbm30w/i-Chat-AI-S3.jpg) | ![](https://i.postimg.cc/fLMPyyJT/i-Chat-AI-S1.jpg) |
+| ![S 1](https://i.postimg.cc/mr0przMr/2.png) | ![S 2](https://i.postimg.cc/yYVQWzJ0/3.png) | ![S 3](https://i.postimg.cc/3wC0kz0D/4.png) |
 
 ---
 
