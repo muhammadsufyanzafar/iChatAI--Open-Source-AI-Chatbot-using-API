@@ -79,12 +79,36 @@ From the root directory of your project, install the necessary packages:
 npm install
 ```
 
-Run the Project on Android Studio 🚀
-Start the Android Studio to see your project:
-```bash
-npm run dev
-```
+### 3. Open in Android Studio 
+- Open Android Studio.
+- Click on "Open an Existing Project".
+- Navigate to the folder where you cloned/extracted the project.
+- Select the project root folder and open it.
 
+### 4. Sync Gradle
+- Once the project opens, Android Studio will automatically sync Gradle.
+- If it doesn’t, click on File → Sync Project with Gradle Files.
+
+### 5. Set SDK Version (if needed)
+- Go to File → Project Structure → SDK Location.
+- Make sure the Android SDK path is correctly set.
+- Ensure the project is using the right Gradle & JDK versions.
+
+### 6. Build the Project
+- Click on Build → Make Project (or press Ctrl+F9 / Cmd+F9).
+
+### 7. Run the App
+- Connect a physical device via USB (with USB Debugging enabled) OR
+- Use an Android Emulator (create one in AVD Manager).
+- Click the green ▶️ Run button in Android Studio.
+
+---
+
+### 🚀 Troubleshooting
+
+- Gradle Sync Failed → Check your internet connection, update Gradle, or delete .gradle folder and resync.
+- SDK not found → Make sure Android SDK is installed via SDK Manager.
+- Emulator issues → Enable virtualization in BIOS, or try a physical device.
 
 ### 🤝 Contributing
 
