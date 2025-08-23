@@ -58,6 +58,16 @@ You will need to download **Git**, **JDK** & *Android Studio* to run this projec
 - Make sure you have the latest version of Git on your computer.
   ---
 
+  ## Getting API Key
+- visit [Open Router](https://openrouter.ai/)
+- Create a new account
+- Search DeepSeek: R1 0528 (free)
+- Click on API
+- Then click on Create API Key button
+- Name that key 
+- Save that API key on a safe place
+- Remember you will not get that API key again
+
 # Getting Started 🎯
 
 ### Fork and Clone the Repository 🚀
@@ -96,6 +106,11 @@ npm install
 
 ### 6. Build the Project
 - Click on Build → Make Project (or press Ctrl+F9 / Cmd+F9).
+
+### 7. Paste your API Key
+- Navigate to app/src\/main/java/com/zafar/ichatai/ApiKeys.java
+- Paste your API key there
+- ![](https://i.postimg.cc/bN49jcjx/Screenshot-2025-08-23-115632.jpg)
 
 ### 7. Run the App
 - Connect a physical device via USB (with USB Debugging enabled) OR
