@@ -33,11 +33,11 @@ iChatAI is a smart, lightweight, and fully customizable AI chatbot application p
 
 ## Installation ⬇️
 
-You will need to download **Git**, **JDK** & *Android Studio* to run this project.
+You will need to download **Git**, **JDK** & **Android Studio** to run this project.
 
 ### Git
 
-- Download and install Git from the official website: [Git Downloads](https://git-scm.com/)
+- Download and install **Git** from the official website: [Git Downloads](https://git-scm.com/)
 - Verify the installation:
   ```bash
   git --version
@@ -45,7 +45,7 @@ You will need to download **Git**, **JDK** & *Android Studio* to run this projec
 
 ### JDK
 
-- Download and installJDK from the official website: [JDK](https://www.oracle.com/java/technologies/downloads/)
+- Download and install **JDK** from the official website: [JDK](https://www.oracle.com/java/technologies/downloads/)
 - Make sure you have the latest version of Git and JDK on your computer.
 - Verify the installation:
   ```bash
@@ -54,7 +54,7 @@ You will need to download **Git**, **JDK** & *Android Studio* to run this projec
 
 ### Android Studio
 
-- Download and install Android Studio from the official website: [Android Studio](https://developer.android.com/studio/)
+- Download and install **Android Studio** from the official website: [Android Studio](https://developer.android.com/studio/)
 - Make sure you have the latest version of Git on your computer.
   ---
 
