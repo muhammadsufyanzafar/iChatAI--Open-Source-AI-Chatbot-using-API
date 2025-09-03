@@ -12,10 +12,8 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.Toast;
@@ -47,6 +45,7 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity implements ConversationAdapter.Listener {
 
     public static final String ACTION_CREDITS_CHANGED = "com.zafar.ichatai.CREDITS_CHANGED";
+
     private static final String STATE_CURRENT_CHAT_ID = "state_current_chat_id";
     private static final String STATE_CHAT_SAVED = "state_chat_saved";
     private static final String STATE_HAS_USER_MSG = "state_has_user_msg";
@@ -84,8 +83,18 @@ public class MainActivity extends AppCompatActivity implements ConversationAdapt
 
     // Credits + ads
     private CreditsManager credits;
+    private int aiResponseCount = 0; // Counter for AI responses to trigger ads
     private final Handler handler = new Handler();
     private boolean interstitialShown = false;
+
+    // Receivers
+    private final BroadcastReceiver networkReceiver = new BroadcastReceiver() {
+        @Override public void onReceive(Context context, Intent intent) {
+            if (!NetworkUtil.isConnected(context)) {
+                Toast.makeText(context, "No Internet Connection", Toast.LENGTH_LONG).show();
+            }
+        }
+    };
 
     @Override
     protected void onSaveInstanceState(@NonNull Bundle outState) {
@@ -115,14 +124,6 @@ public class MainActivity extends AppCompatActivity implements ConversationAdapt
         outState.putBooleanArray(STATE_MSG_IS_USER, isUserArray);
     }
 
-    // Receivers
-    private final BroadcastReceiver networkReceiver = new BroadcastReceiver() {
-        @Override public void onReceive(Context context, Intent intent) {
-            if (!NetworkUtil.isConnected(context)) {
-                Toast.makeText(context, "No Internet Connection", Toast.LENGTH_LONG).show();
-            }
-        }
-    };
 
     private final BroadcastReceiver creditsReceiver = new BroadcastReceiver() {
         @Override public void onReceive(Context context, Intent intent) {
@@ -195,12 +196,10 @@ public class MainActivity extends AppCompatActivity implements ConversationAdapt
                 Toast.makeText(this, "Please wait for the current reply to finish.", Toast.LENGTH_SHORT).show();
                 return;
             }
-            if (savedInstanceState == null) {
-                // first launch only
-                startUnsavedChat();
-            } else {
-                restoreFromState(savedInstanceState);
-            }
+            startUnsavedChat();
+            // ** REQUIREMENT: Load ad when user clicks "New Chat" **
+            // Best Practice: Show the ad *after* the new chat screen is visible to avoid a jarring transition.
+            AdHelper.showInterstitial(this, shown -> { /* Callback after ad is closed or fails */ });
         });
 
         // Drawer actions
@@ -232,11 +231,16 @@ public class MainActivity extends AppCompatActivity implements ConversationAdapt
         recyclerView.setAdapter(adapter);
 
         // Always start a fresh unsaved session
-        startUnsavedChat();
+        if (savedInstanceState == null) {
+            // first launch only
+            startUnsavedChat();
+        } else {
+            restoreFromState(savedInstanceState);
+        }
+
 
         // Send logic (credits gated, single-flight while AI replies)
         sendButton.setOnClickListener(v -> handleSend());
-
 
         // Receivers
         registerReceiver(networkReceiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
@@ -254,13 +258,9 @@ public class MainActivity extends AppCompatActivity implements ConversationAdapt
         loadConversations();
         updateCreditsUI();
 
-        // Interstitial (optional)
+        // ** REQUIREMENT: Removed 30-second ad delay. **
+        // Best Practice: Pre-load ads at strategic points (like app start) so they are ready to show instantly when needed.
         AdHelper.warmUp(this);
-        handler.postDelayed(() -> {
-            if (!interstitialShown) {
-                AdHelper.showInterstitial(this, shown -> interstitialShown = true);
-            }
-        }, 30_000);
     }
 
     private void restoreFromState(@NonNull Bundle state) {
@@ -297,6 +297,7 @@ public class MainActivity extends AppCompatActivity implements ConversationAdapt
         scrollToBottom();
     }
 
+
     // Start a new unsaved chat session in UI (no DB writes yet)
     private void startUnsavedChat() {
         adapter = new MessageAdapter();
@@ -328,14 +329,14 @@ public class MainActivity extends AppCompatActivity implements ConversationAdapt
         if (!credits.spend(1)) {
             new AlertDialog.Builder(this)
                     .setTitle("Out of credits")
-                    .setMessage("Watch a short ad to earn 5 credits and continue.")
+                    .setMessage("You can watch an ad to earn more credits.")
                     .setPositiveButton("Get credits", (d, w) -> startActivity(new Intent(this, CreditsActivity.class)))
                     .setNegativeButton("Cancel", null)
                     .show();
             return;
         }
         updateCreditsUI();
-        sendBroadcast(new Intent(ACTION_CREDITS_CHANGED).setPackage(/* TODO: provide the application ID. For example: */ getPackageName()));
+        sendBroadcast(new Intent(ACTION_CREDITS_CHANGED));
 
         // Add user's message to UI
         adapter.addMessage(new Message(query, true));
@@ -374,6 +375,16 @@ public class MainActivity extends AppCompatActivity implements ConversationAdapt
                     } else {
                         // Subsequent turns: save AI message only (user already saved above)
                         saveAiMessage(currentChatId, content);
+                    }
+
+                    // ** REQUIREMENT: Load ad after every three AI responses with a 3-second delay **
+                    aiResponseCount++;
+                    if (aiResponseCount % 3 == 0) {
+                        // Best Practice: A short delay prevents the ad from appearing too abruptly after the content,
+                        // giving the user a moment to process the AI's response. This improves the user experience.
+                        handler.postDelayed(() -> {
+                            AdHelper.showInterstitial(MainActivity.this, shown -> { /* Ad shown or not */ });
+                        }, 3000); // 3000 milliseconds = 3 seconds
                     }
                 });
             }
@@ -528,6 +539,9 @@ public class MainActivity extends AppCompatActivity implements ConversationAdapt
     public void onChatClicked(@NonNull Chat chat) {
         drawerLayout.closeDrawer(GravityCompat.START);
         loadMessagesFor(chat.id);
+        // ** REQUIREMENT: Load ad when user opens an old chat **
+        // Best Practice: Loading an ad upon resuming a previous session is a common and accepted practice.
+        AdHelper.showInterstitial(this, shown -> { /* Ad shown or not */ });
     }
 
     @Override
@@ -579,3 +593,4 @@ class NetworkUtil {
         return n != null && n.isConnected();
     }
 }
+

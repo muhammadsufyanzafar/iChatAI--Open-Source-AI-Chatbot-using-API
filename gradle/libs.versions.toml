@@ -11,6 +11,7 @@ roomCommonJvm = "2.7.2"
 roomRuntimeJvm = "2.7.2"
 monitor = "1.8.0"
 androidxJunit = "1.3.0"
+playServicesAdsApi = "24.5.0"
 
 [libraries]
 junit = { group = "junit", name = "junit", version.ref = "junit" }
@@ -24,6 +25,7 @@ room-common-jvm = { group = "androidx.room", name = "room-common-jvm", version.r
 room-runtime-jvm = { group = "androidx.room", name = "room-runtime-jvm", version.ref = "roomRuntimeJvm" }
 monitor = { group = "androidx.test", name = "monitor", version.ref = "monitor" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "androidxJunit" }
+play-services-ads-api = { group = "com.google.android.gms", name = "play-services-ads-api", version.ref = "playServicesAdsApi" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
