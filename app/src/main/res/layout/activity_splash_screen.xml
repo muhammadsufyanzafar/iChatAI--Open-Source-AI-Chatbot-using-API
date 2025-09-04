@@ -7,9 +7,6 @@
     android:layout_height="match_parent"
     android:background="@drawable/bg_splash_gradient">
 
-    <!-- App Logo -->
-
-    <!-- App Name -->
     <ImageView
         android:id="@+id/logoImage"
         android:layout_width="250dp"

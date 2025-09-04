@@ -16,6 +16,7 @@ import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.ImageButton;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
@@ -151,6 +152,9 @@ public class MainActivity extends AppCompatActivity implements ConversationAdapt
         btnMenu = findViewById(R.id.btnMenu);
         btnNewChat = findViewById(R.id.btnNewChat);
         chipCredits = findViewById(R.id.chipCredits);
+        chipCredits.setOnClickListener(v -> {
+            startActivity(new Intent(MainActivity.this, CreditsActivity.class));
+        });
 
         recyclerView = findViewById(R.id.recyclerView);
         queryEditText = findViewById(R.id.queryEditText);

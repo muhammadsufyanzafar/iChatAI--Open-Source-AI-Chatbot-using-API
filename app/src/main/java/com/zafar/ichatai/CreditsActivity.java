@@ -2,6 +2,7 @@ package com.zafar.ichatai;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -44,6 +45,12 @@ public class CreditsActivity extends AppCompatActivity {
         });
 
         updateCredits();
+
+        // New Daily Check-In button
+        Button btnDailyCheckIn = findViewById(R.id.btnDailyCheckIn);
+        btnDailyCheckIn.setOnClickListener(v -> {
+            startActivity(new Intent(CreditsActivity.this, DailyCheckInActivity.class));
+        });
     }
 
     @Override

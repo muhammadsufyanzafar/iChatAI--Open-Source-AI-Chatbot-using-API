@@ -1,6 +1,4 @@
 <resources>
     <string name="app_name">iChatAI</string>
     <string name="copy_to_clipboard">Copy to clipboard</string>
-<!--    <string name="admob_interstitial_id">ca-app-pub-XXXXXXXXXXXXXXXX/YYYYYYYYYY</string>-->
-<!--    <string name="admob_rewarded_id">ca-app-pub-XXXXXXXXXXXXXXXX/ZZZZZZZZZZ</string>-->
 </resources>

@@ -78,12 +78,30 @@
         android:layout_marginTop="12dp"
         android:textAppearance="?attr/textAppearanceBodyLarge" />
 
+    <!-- New Daily Check-In button -->
+    <Button
+        android:id="@+id/btnDailyCheckIn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+
+        android:text="Check In"
+        style="?attr/materialButtonOutlinedStyle" />
+
+    <!-- "or" separator -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="or"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="16dp" />
+
     <!-- Reward button -->
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btnWatchAd"
         android:layout_marginTop="16dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Watch ad to earn credits"
+        android:text="Watch ad to earn more credits"
         app:iconGravity="start" />
 </LinearLayout>

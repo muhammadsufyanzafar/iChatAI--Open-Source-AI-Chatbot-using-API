@@ -41,8 +41,8 @@ public class DeepSeekClient {
                     .addHeader("Authorization", "Bearer " + ApiKeys.OPENROUTER_API_KEY)
                     .addHeader("Accept", "application/json")
                     .addHeader("Content-Type", "application/json")
-                    .addHeader("HTTP-Referer", "com.zafar.ichataibeta")
-                    .addHeader("X-Title", "iChatAI Beta")
+                    .addHeader("HTTP-Referer", "com.zafar.ichatai")
+                    .addHeader("X-Title", "iChatAI")
                     .post(RequestBody.create(body.toString(), JSON))
                     .build();
 
