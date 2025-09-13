@@ -6,7 +6,7 @@ iChatAI is a smart, lightweight, and fully customizable AI chatbot application p
 
 ## 🌐 Live Site
 🔗 Check out the live preview of the iChatAI App here on
-[**Huawei AppGallery**](https://appgallery.huawei.com/#/app/C108762671)
+[**Huawei AppGallery**](https://appgallery.huawei.com/#/app/C107066351)
 ---
 
 ## 🚀 Features
