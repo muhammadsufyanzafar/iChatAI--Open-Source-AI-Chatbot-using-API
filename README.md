@@ -2,7 +2,11 @@
 ![Banner](https://i.postimg.cc/1zPf1M7R/1.png)
 Welcome to **iChatAI**, a sleek and powerful AI chatbot built using **DeepSeek API**, designed for seamless integration and intelligent conversations.
 iChatAI is a smart, lightweight, and fully customizable AI chatbot application powered by DeepSeek APIs. Designed with user experience in mind, iChatAI brings the power of conversational AI to mobile and web platforms in a clean and intuitive interface
+---
 
+## 🌐 Live Site
+🔗 Check out the live preview of the iChatAI App here on
+[**Huawei AppGallery**](https://appgallery.huawei.com/#/app/C108762671)
 ---
 
 ## 🚀 Features
