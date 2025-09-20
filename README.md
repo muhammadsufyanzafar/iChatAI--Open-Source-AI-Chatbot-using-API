@@ -1,4 +1,4 @@
-# 🤖 **iChatAI - Smart AI Chatbot (Open Source)**
+## 🤖 **iChatAI - Smart AI Chatbot (Open Source)**
 ![Banner](https://i.postimg.cc/1zPf1M7R/1.png)
 
 Welcome to **iChatAI**, a sleek and powerful AI chatbot built using **DeepSeek API**, designed for seamless integration and intelligent conversations.
