@@ -68,7 +68,7 @@ You will need to download **Git**, **JDK** & **Android Studio** to run this proj
   ---
 
   ## Getting API Key
-- visit [Open Router](https://openrouter.ai/)
+- visit [**Open Router**](https://openrouter.ai/)
 - Create a new account
 - Search DeepSeek: R1 0528 (free)
 - Click on API
