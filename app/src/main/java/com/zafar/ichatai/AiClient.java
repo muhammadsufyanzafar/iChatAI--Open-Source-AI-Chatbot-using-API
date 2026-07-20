@@ -14,7 +14,7 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
-public class DeepSeekClient {
+public class AiClient {
 
     private static final String BASE_URL = "https://openrouter.ai/api/v1/chat/completions";
     private static final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
@@ -24,7 +24,7 @@ public class DeepSeekClient {
     public void getResponse(String query, ResponseCallback callback) {
         try {
             JSONObject body = new JSONObject();
-            body.put("model", "deepseek/deepseek-r1:free");
+            body.put("model", "openrouter/free");
 
             JSONArray messages = new JSONArray();
             JSONObject msg = new JSONObject();

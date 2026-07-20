@@ -3,8 +3,8 @@
 
 ---
 
-Welcome to **iChatAI**, a sleek and powerful AI chatbot built using **DeepSeek API**, designed for seamless integration and intelligent conversations.
-iChatAI is a smart, lightweight, and fully customizable AI chatbot application powered by DeepSeek APIs. Designed with user experience in mind, iChatAI brings the power of conversational AI to mobile and web platforms in a clean and intuitive interface
+Welcome to **iChatAI**, a sleek and powerful AI chatbot built using **Free Models Router (via OpenRouter)**, designed for seamless integration and intelligent conversations.
+iChatAI is a smart, lightweight, and fully customizable AI chatbot application powered by Free Models Router. Designed with user experience in mind, iChatAI brings the power of conversational AI to mobile and web platforms in a clean and intuitive interface
 
 ---
 
@@ -15,7 +15,7 @@ iChatAI is a smart, lightweight, and fully customizable AI chatbot application p
 ---
 
 ## 🚀 Features
-- 🔥 Chat with AI using DeepSeek APIs
+- 🔥 Chat with AI using Free Models Router
 - 🧠 Handles real-time conversations
 - 💬 Clean UI & responsive design
 - 🔧 Easy to configure and deploy
@@ -70,7 +70,7 @@ You will need to download **Git**, **JDK** & **Android Studio** to run this proj
   ## Getting API Key
 - visit [**Open Router**](https://openrouter.ai/)
 - Create a new account
-- Search DeepSeek: R1 0528 (free)
+- Search for free models (e.g., DeepSeek R1)
 - Click on API
 - Then click on Create API Key button
 - Name that key 

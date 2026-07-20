@@ -1,5 +1,6 @@
 package com.zafar.ichatai;
 
+import android.annotation.SuppressLint;
 import android.content.BroadcastReceiver;
 import android.content.ClipData;
 import android.content.ClipboardManager;
@@ -132,6 +133,7 @@ public class MainActivity extends AppCompatActivity implements ConversationAdapt
         }
     };
 
+    @SuppressLint("UnspecifiedRegisterReceiverFlag")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         ThemeUtils.applySavedTheme(this);
@@ -340,7 +342,7 @@ public class MainActivity extends AppCompatActivity implements ConversationAdapt
             return;
         }
         updateCreditsUI();
-        sendBroadcast(new Intent(ACTION_CREDITS_CHANGED));
+        sendBroadcast(new Intent(ACTION_CREDITS_CHANGED).setPackage(/* TODO: provide the application ID. For example: */ getPackageName()));
 
         // Add user's message to UI
         adapter.addMessage(new Message(query, true));
@@ -360,7 +362,7 @@ public class MainActivity extends AppCompatActivity implements ConversationAdapt
         scrollToBottom();
 
         // AI call
-        DeepSeekClient model = new DeepSeekClient();
+        AiClient model = new AiClient();
         progressBar.setVisibility(View.VISIBLE);
         model.getResponse(query, new ResponseCallback() {
             @Override
