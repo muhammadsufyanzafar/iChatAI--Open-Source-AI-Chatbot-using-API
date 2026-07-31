@@ -361,10 +361,10 @@ public class MainActivity extends AppCompatActivity implements ConversationAdapt
         adapter.addMessage(new Message("Thinking…", false));
         scrollToBottom();
 
-        // AI call
-        AiClient model = new AiClient();
+        // AI call with full context history for multi-turn chat support
+        AiClient model = new AiClient(this);
         progressBar.setVisibility(View.VISIBLE);
-        model.getResponse(query, new ResponseCallback() {
+        model.getResponse(adapter.getMessages(), new ResponseCallback() {
             @Override
             public void onResponse(String response) {
                 runOnUiThread(() -> {

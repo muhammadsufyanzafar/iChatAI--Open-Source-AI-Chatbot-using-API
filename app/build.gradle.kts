@@ -57,6 +57,7 @@ dependencies {
     implementation(libs.monitor)
     implementation(libs.androidx.junit)
     testImplementation("junit:junit:4.12")
+    testImplementation("org.json:json:20231013")
     androidTestImplementation("junit:junit:4.12")
     annotationProcessor("androidx.room:room-compiler:2.6.1")
 

@@ -26,6 +26,9 @@ public class SettingsActivity extends AppCompatActivity {
     private MaterialButtonToggleGroup themeToggle;
     private MaterialButton btnSystem, btnLight, btnDark;
 
+    private MaterialButtonToggleGroup modelToggle;
+    private MaterialButton btnModelFree, btnModelR1, btnModelLlama, btnModelQwen;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         // Make sure the saved theme is applied before inflating the layout
@@ -78,6 +81,33 @@ public class SettingsActivity extends AppCompatActivity {
             recreate();
         });
 
+        // Model selection toggle
+        modelToggle = findViewById(R.id.modelToggleGroup);
+        btnModelFree = findViewById(R.id.btnModelFree);
+        btnModelR1 = findViewById(R.id.btnModelR1);
+        btnModelLlama = findViewById(R.id.btnModelLlama);
+        btnModelQwen = findViewById(R.id.btnModelQwen);
+
+        // Preselect current model
+        String selectedModel = sp.getString("selected_model", "openrouter/free");
+        selectCurrentModelButton(selectedModel);
+
+        modelToggle.addOnButtonCheckedListener((group, checkedId, isChecked) -> {
+            if (!isChecked) return;
+
+            String modelStr = "openrouter/free";
+            if (checkedId == R.id.btnModelR1) {
+                modelStr = "deepseek/deepseek-r1:free";
+            } else if (checkedId == R.id.btnModelLlama) {
+                modelStr = "meta-llama/llama-3-8b-instruct:free";
+            } else if (checkedId == R.id.btnModelQwen) {
+                modelStr = "qwen/qwen-2.5-72b-instruct:free";
+            }
+
+            sp.edit().putString("selected_model", modelStr).apply();
+            Toast.makeText(this, "Model set to: " + modelStr, Toast.LENGTH_SHORT).show();
+        });
+
         // Version
         TextView versionText = findViewById(R.id.txtVersion);
         versionText.setText(getVersionNameSafe());
@@ -89,6 +119,18 @@ public class SettingsActivity extends AppCompatActivity {
                 openLink("https://onlineshoppingdealofficial.blogspot.com/p/ichatais-privacy-policy.html"));
         findViewById(R.id.rowContact).setOnClickListener(v ->
                 openLink("https://muhammadsufyanzafar.github.io/portfolio/#contact"));
+    }
+
+    private void selectCurrentModelButton(String modelStr) {
+        if ("deepseek/deepseek-r1:free".equals(modelStr)) {
+            modelToggle.check(R.id.btnModelR1);
+        } else if ("meta-llama/llama-3-8b-instruct:free".equals(modelStr)) {
+            modelToggle.check(R.id.btnModelLlama);
+        } else if ("qwen/qwen-2.5-72b-instruct:free".equals(modelStr)) {
+            modelToggle.check(R.id.btnModelQwen);
+        } else {
+            modelToggle.check(R.id.btnModelFree);
+        }
     }
 
     private void selectCurrentThemeButton(int mode) {
