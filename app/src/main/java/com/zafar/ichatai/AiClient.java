@@ -1,10 +1,15 @@
 package com.zafar.ichatai;
 
+import android.content.Context;
+import android.content.SharedPreferences;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -20,21 +25,58 @@ public class AiClient {
     private static final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
 
     private final OkHttpClient httpClient = new OkHttpClient();
+    private final Context context;
+
+    public AiClient() {
+        this.context = null;
+    }
+
+    public AiClient(Context context) {
+        this.context = context != null ? context.getApplicationContext() : null;
+    }
+
+    private String getSelectedModel() {
+        if (context == null) {
+            return "openrouter/free";
+        }
+        SharedPreferences sp = context.getSharedPreferences("app_settings", Context.MODE_PRIVATE);
+        return sp.getString("selected_model", "openrouter/free");
+    }
+
+    public static JSONObject buildRequestBody(String modelName, List<Message> history) throws JSONException {
+        JSONObject body = new JSONObject();
+        body.put("model", modelName);
+
+        JSONArray messages = new JSONArray();
+        for (Message m : history) {
+            String text = m.getText();
+            if (text == null || text.trim().isEmpty() ||
+                text.equals("New chat started. Ask me anything!") ||
+                text.equals("Thinking…")) {
+                continue;
+            }
+            JSONObject msg = new JSONObject();
+            msg.put("role", m.isUser() ? "user" : "assistant");
+            msg.put("content", text);
+            messages.put(msg);
+        }
+
+        body.put("messages", messages);
+        body.put("temperature", 0.9);
+        body.put("top_p", 0.1);
+        return body;
+    }
 
     public void getResponse(String query, ResponseCallback callback) {
+        List<Message> history = new ArrayList<>();
+        history.add(new Message(query, true));
+        getResponse(history, callback);
+    }
+
+    public void getResponse(List<Message> history, ResponseCallback callback) {
         try {
-            JSONObject body = new JSONObject();
-            body.put("model", "openrouter/free");
-
-            JSONArray messages = new JSONArray();
-            JSONObject msg = new JSONObject();
-            msg.put("role", "user");
-            msg.put("content", query);
-            messages.put(msg);
-
-            body.put("messages", messages);
-            body.put("temperature", 0.9);
-            body.put("top_p", 0.1);
+            String modelName = getSelectedModel();
+            JSONObject body = buildRequestBody(modelName, history);
 
             Request request = new Request.Builder()
                     .url(BASE_URL)
